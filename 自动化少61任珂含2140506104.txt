@@ -1,0 +1,64 @@
+%1边缘检测
+i1 =im2double(imread('test6.jpg'));%原图
+%i1=i1(:,:,1);
+
+icanny = edge(i1, 'canny',[0.04,0.12]); 
+isobel = edge(i1, 'sobel');
+iprewitt = edge(i1, 'prewitt');  %边缘提取
+
+figure();  
+subplot(2,2,1); imshow(i1); title('t6原图');
+subplot(2,2,2); imshow(icanny); title('canny');
+subplot(2,2,3); imshow(isobel); title('sobel');
+subplot(2,2,4); imshow(iprewitt); title('prewitt');
+%saveas(gcf,'aat4.png');%绘图
+
+
+%2直线检测
+i1 =im2double(imread('test6.jpg'));%原图
+%i1=i1(:,:,1);
+
+icanny = edge(i1, 'canny',[0.04,0.12]); %上限是下限3倍
+isobel = edge(i1, 'sobel');
+iprewitt = edge(i1, 'prewitt');  %边缘提取
+
+% figure();  
+% subplot(2,2,1); imshow(i1); title('t6原图');
+% subplot(2,2,2); imshow(icanny); title('canny');
+% subplot(2,2,3); imshow(isobel); title('sobel');
+% subplot(2,2,4); imshow(iprewitt); title('prewitt');
+%saveas(gcf,'aat4.png');%绘图
+
+
+[Hc,Tc,Rc] = hough(icanny,'RhoResolution',1,'Theta',-90:0.5:89.5);  
+[Hs,Ts,Rs] = hough(isobel,'RhoResolution',1,'Theta',-90:0.5:89.5);
+[Hp,Tp,Rp] = hough(iprewitt,'RhoResolution',1,'Theta',-90:0.5:89.5);% hough变换
+
+aa = 7;
+pc = houghpeaks(Hc,aa);lc = houghlines(icanny,Tc,Rc,pc);
+ps = houghpeaks(Hs,aa);ls = houghlines(isobel,Ts,Rs,ps);
+pp = houghpeaks(Hp,aa);lp = houghlines(iprewitt,Tp,Rp,pp);
+
+figure(); 
+subplot(2,2,1); imshow(i1); title('t1原图');
+subplot(2,2,2); 
+imshow(icanny,[]),title('hough变换-canny-7'),hold on %(['hough变换-canny-'，{aa}]);
+ for k=1:length(lc)
+xy=[lc(k).point1;lc(k).point2];   
+plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','red');
+ end
+ hold off
+ subplot(2,2,3); 
+ imshow(isobel,[]),title('hough变换-sobel-7'),hold on 
+ for k=1:length(ls)
+xy=[ls(k).point1;ls(k).point2];   
+plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','red');
+ end
+ hold off
+ subplot(2,2,4); 
+  imshow(iprewitt,[]),title('hough变换-prewitt-7'),hold on
+ for k=1:length(linesPrewitt)
+xy=[linesPrewitt(k).point1;linesPrewitt(k).point2];   
+plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','red');
+ end
+ hold off%画直线
